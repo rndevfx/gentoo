@@ -17,10 +17,12 @@ LICENSE="LGPL-2.1"
 SLOT="0"
 SRC_URI="http://spice-space.org/download/gtk/${P}.tar.bz2"
 KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
-IUSE="dbus gstreamer gtk3 +introspection lz4 mjpeg policykit pulseaudio sasl smartcard static-libs usbredir vala webdav libressl vpx x264"
+IUSE="dbus gstaudio gstvideo gtk3 +introspection lz4 builtin-mjpeg policykit pulseaudio sasl smartcard static-libs usbredir vala webdav libressl mjpeg vpx x264"
 
 REQUIRED_USE="
-	?? ( pulseaudio gstreamer )
+	?? ( pulseaudio gstaudio )
+	^^ ( mjpeg builtin-mjpeg ) )
+	gstvideo? ( || ( mjpeg vpx x264 ) )
 "
 
 # TODO:
@@ -30,12 +32,18 @@ RDEPEND="
 	!libressl? ( dev-libs/openssl:0= )
 	libressl? ( dev-libs/libressl:0= )
 	pulseaudio? ( media-sound/pulseaudio[glib] )
-	gstreamer? (
+	gstvideo? (
 		media-libs/gstreamer:1.0
 		media-libs/gst-plugins-base:1.0
 		media-libs/gst-plugins-good:1.0
+		mjpeg? ( media-plugins/gst-plugins-libav:1.0 )
 		vpx? ( media-plugins/gst-plugins-vpx:1.0 )
 		x264? ( media-plugins/gst-plugins-libav:1.0 )
+		)
+	gstaudio? (
+		media-libs/gstreamer:1.0
+		media-libs/gst-plugins-base:1.0
+		media-libs/gst-plugins-good:1.0
 		)
 	>=x11-libs/pixman-0.17.7
 	>=media-libs/celt-0.5.1.1:0.5.1
@@ -74,7 +82,7 @@ DEPEND="${RDEPEND}
 	vala? ( $(vala_depend) )
 "
 
-REQUIRED_USE="gstreamer? ( || ( vpx x264 ) )"
+REQUIRED_USE="gstvideo? ( || ( vpx x264 ) )"
 # Hard-deps while building from git:
 # dev-lang/vala:0.14
 # dev-lang/perl
@@ -111,9 +119,9 @@ src_configure() {
 		$(use_with gtk3 gtk 3.0) \
 		$(use_enable policykit polkit) \
 		$(use_enable pulseaudio pulse) \
-		$(use_enable gstreamer gstaudio) \
-		$(use_enable gstreamer gstvideo) \
-		$(use_enable mjpeg builtin-mjpeg) \
+		$(use_enable gstaudio) \
+		$(use_enable gstvideo) \
+		$(use_enable builtin-mjpeg) \
 		$(use_enable vala) \
 		$(use_enable webdav) \
 		$(use_enable dbus) \
