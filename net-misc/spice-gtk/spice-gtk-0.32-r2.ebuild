@@ -8,15 +8,15 @@ WANT_AUTOMAKE="1.12"
 VALA_MIN_API_VERSION="0.14"
 VALA_USE_DEPEND="vapigen"
 
-inherit autotools eutils vala git-r3
+inherit autotools eutils vala
 
 DESCRIPTION="Set of GObject and Gtk objects for connecting to Spice servers and a client GUI"
 HOMEPAGE="http://spice-space.org https://cgit.freedesktop.org/spice/spice-gtk/"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-EGIT_REPO_URI="git://anongit.freedesktop.org/spice/spice-gtk.git"
-KEYWORDS=""
+SRC_URI="http://spice-space.org/download/gtk/${P}.tar.bz2"
+KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~sparc ~x86"
 IUSE="dbus gstreamer gtk3 +introspection lz4 mjpeg policykit pulseaudio sasl smartcard static-libs usbredir vala webdav libressl vpx x264"
 
 REQUIRED_USE="
@@ -65,7 +65,7 @@ RDEPEND="
 		>=net-libs/libsoup-2.49.91 )
 "
 DEPEND="${RDEPEND}
-	=app-emulation/spice-protocol-9999
+	>=app-emulation/spice-protocol-0.12.11
 	dev-perl/Text-CSV
 	>=dev-util/gtk-doc-am-1.14
 	>=dev-util/intltool-0.40.0
@@ -75,7 +75,6 @@ DEPEND="${RDEPEND}
 "
 
 REQUIRED_USE="gstreamer? ( || ( vpx x264 ) )"
-
 # Hard-deps while building from git:
 # dev-lang/vala:0.14
 # dev-lang/perl
@@ -87,7 +86,7 @@ addpredict /dev
 src_prepare() {
 	epatch_user
 
-	eautoreconf
+	AT_NO_RECURSIVE="yes" eautoreconf
 
 	use vala && vala_src_prepare
 }
@@ -128,7 +127,7 @@ src_configure() {
 src_install() {
 	default
 
-	dodoc AUTHORS NEWS README TODO
+	dodoc AUTHORS ChangeLog NEWS README THANKS TODO
 
 	# Remove .la files if they're not needed
 	use static-libs || prune_libtool_files
